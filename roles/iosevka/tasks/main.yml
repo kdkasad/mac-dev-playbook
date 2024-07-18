@@ -27,6 +27,11 @@
         executable: /bin/zsh
       changed_when: false
 
+    - name: Ensure ttfautohint is installed
+      community.general.homebrew:
+        name: ttfautohint
+        state: present
+
     - name: Clone Iosevka sources
       ansible.builtin.git:
         repo: "{{ iosevka_repo_url }}"
@@ -35,7 +40,7 @@
         depth: 1
         recursive: no
 
-    - name: Install build dependencies
+    - name: Install NPM dependencies
       ansible.builtin.shell:
         cmd: npm ci
         chdir: "{{ iosevka_local_repo_path }}"
@@ -51,7 +56,7 @@
 
     - name: Compile Iosevka
       ansible.builtin.shell:
-        cmd: "{{ (['npm', 'run', 'build'] + (iosevka_targets | map('regex_replace', '^', 'ttf::'))) | map('quote') | join(' ') }}"
+        cmd: "{{ (['npm', 'run', 'build', '--'] + (iosevka_targets | map('regex_replace', '^', 'ttf::'))) | map('quote') | join(' ') }}"
         chdir: "{{ iosevka_local_repo_path }}"
         executable: /bin/zsh
       changed_when: true
