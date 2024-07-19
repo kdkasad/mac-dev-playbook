@@ -11,8 +11,7 @@
 
 - name: Ensure a Node.js runtime is installed
   ansible.builtin.shell:
-    # FIXME: Use latest version once https://github.com/nodejs/node/issues/53902 is resolved
-    cmd: source {{ [nvm_dir, 'nvm.sh'] | path_join | expanduser | quote }} && nvm install --default v22.4.1
+    cmd: source {{ [nvm_dir, 'nvm.sh'] | path_join | expanduser | quote }} && nvm install node
     executable: /bin/bash
     creates: "{{ nvm_dir }}/alias/default"
   environment:
