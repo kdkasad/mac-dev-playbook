@@ -6,40 +6,29 @@
 # need to use zsh to execute the npm commands, which cannot be done with
 # ansible.builtin.command.
 
-- name: Ensure fontconfig is installed
+- name: Ensure NPM is found
+  ansible.builtin.shell:
+    cmd: npm --version
+    executable: /bin/zsh
+  changed_when: false
+
+- name: Ensure ttfautohint is installed
   community.general.homebrew:
-    name: fontconfig
+    name: ttfautohint
     state: present
 
-- name: Check if Iosevka font exists
-  ansible.builtin.command:
-    cmd: fc-list -q Iosevka
-  register: fc_list
-  changed_when: false
-  failed_when: fc_list.rc not in [0, 1]
+- name: Clone Iosevka sources
+  ansible.builtin.git:
+    repo: "{{ iosevka_repo_url }}"
+    version: "{{ iosevka_repo_ref }}"
+    dest: "{{ iosevka_local_repo_path }}"
+    depth: 1
+    recursive: no
+  register: clone_sources
 
-- name: Build & install Iosevka
-  when: fc_list.rc != 0
+- name: Build & install Iosevka  # noqa no-handler
+  when: clone_sources.changed
   block:
-    - name: Ensure NPM is found
-      ansible.builtin.shell:
-        cmd: npm --version
-        executable: /bin/zsh
-      changed_when: false
-
-    - name: Ensure ttfautohint is installed
-      community.general.homebrew:
-        name: ttfautohint
-        state: present
-
-    - name: Clone Iosevka sources
-      ansible.builtin.git:
-        repo: "{{ iosevka_repo_url }}"
-        version: "{{ iosevka_repo_ref }}"
-        dest: "{{ iosevka_local_repo_path }}"
-        depth: 1
-        recursive: no
-
     - name: Install NPM dependencies
       ansible.builtin.shell:
         cmd: npm ci
