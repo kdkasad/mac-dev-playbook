@@ -25,7 +25,7 @@
     index_var: index
   when: item not in have_extensions
   register: install_results
-  changed_when: install_results.rc == 0
+  changed_when: "'was successfully installed' in install_results.stdout"
   # Installation will often fail because many extensions are only available in
   # Microsoft's extension repository and not in OpenVSX.
   failed_when: false
