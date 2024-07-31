@@ -87,6 +87,8 @@
         name: vscodium_extensions
       environment:
         PATH: "{{ new_path }}"
+      tags:
+        - vscodium
 
     - name: Install NVM & Node.js
       ansible.builtin.import_role:
