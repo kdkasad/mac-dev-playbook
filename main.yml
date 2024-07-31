@@ -80,7 +80,7 @@
       loop:
         - ['PrefsCustomFolder', 'string', '{{ iterm2_settings_dir }}']  # Set directory to load settings from
         - ['LoadPrefsFromCustomFolder', 'bool', true]  # Enable loading settings from directory
-        - ['NoSyncNeverRemindPrefsChangesLostForFile_selection', 'int', 2]  # Automatically save changes to settings
+        - ['NoSyncNeverRemindPrefsChangesLostForFile_selection', 'int', 0]  # Save changes to settings when quitting iTerm
 
     - name: Install VSCodium extensions
       ansible.builtin.import_role:
