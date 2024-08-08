@@ -1,0 +1,8 @@
+---
+colemak_dh_repo: https://github.com/ColemakMods/mod-dh.git
+colemak_dh_repo_ref: master
+colemak_dh_repo_dest: ~/Miscellaneous/opt/colemak-dh
+
+# Whether to install the layout system-wide or just for the current user
+# Possible values: system, user
+colemak_dh_installation_type: system

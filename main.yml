@@ -21,12 +21,12 @@
     - name: Install dotfiles
       ansible.builtin.import_role:
         name: dotfiles
-      tags: ['dotfiles']
+      tags: ["dotfiles"]
 
     - name: Install Homebrew & packages
       ansible.builtin.import_role:
         name: homebrew
-      tags: ['homebrew']
+      tags: ["homebrew"]
 
     - name: Create new PATH including Homebrew packages
       ansible.builtin.set_fact:
@@ -49,7 +49,7 @@
         path: /private/etc/pam.d/sudo_local
         create: yes
         owner: root
-        mode: '0644'
+        mode: "0644"
         line: auth sufficient pam_tid.so
         regexp: 'auth\s+sufficient\s+pam_tid\.so'
       become: yes
@@ -62,13 +62,13 @@
       when: >-
         ((mas_installed_apps is defined) and mas_installed_apps)
         or ((mas_installed_apps_file is defined) and mas_installed_apps_file)
-      tags: ['mas']
+      tags: ["mas"]
 
     - name: Configure dock
       ansible.builtin.import_role:
         name: dock
       when: (dock_list_file is defined) and dock_list_file
-      tags: ['dock']
+      tags: ["dock"]
 
     - name: Configure iTerm2 to load settings from filesystem
       community.general.osx_defaults:
@@ -78,10 +78,17 @@
         type: "{{ item.1 }}"
         value: "{{ item.2 }}"
       loop:
-        - ['PrefsCustomFolder', 'string', '{{ iterm2_settings_dir }}']  # Set directory to load settings from
-        - ['LoadPrefsFromCustomFolder', 'bool', true]  # Enable loading settings from directory
-        - ['NoSyncNeverRemindPrefsChangesLostForFile_selection', 'int', 0]  # Save changes to settings when quitting iTerm
+        - ["PrefsCustomFolder", "string", "{{ iterm2_settings_dir }}"] # Set directory to load settings from
+        - ["LoadPrefsFromCustomFolder", "bool", true] # Enable loading settings from directory
+        - ["NoSyncNeverRemindPrefsChangesLostForFile_selection", "int", 0] # Save changes to settings when quitting iTerm
 
+    - name: Install Colemak-DH keyboard layouts
+      ansible.builtin.import_role:
+        name: colemak_dh
+      environment:
+        PATH: "{{ new_path }}"
+      tags:
+        - colemak
     - name: Install VSCodium extensions
       ansible.builtin.import_role:
         name: vscodium_extensions

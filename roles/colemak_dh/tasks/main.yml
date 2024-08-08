@@ -1,0 +1,42 @@
+---
+- name: Download Colemak-DH layouts
+  ansible.builtin.git:
+    repo: "{{ colemak_dh_repo }}"
+    version: "{{ colemak_dh_repo_ref }}"
+    dest: "{{ colemak_dh_repo_dest }}"
+    update: yes
+    force: yes
+    depth: 1
+
+- name: Enumerate Colemak-DH layout bundles
+  ansible.builtin.find:
+    paths: "{{ colemak_dh_repo_dest }}/macOS"
+    patterns: '*.bundle'
+    file_type: directory
+    recurse: no
+  register: colemak_dh_bundles
+
+- name: Set installation directory
+  ansible.builtin.set_fact:
+    colemak_dh_dest_dir: "{{ (colemak_dh_installation_type == 'system') | ternary('', '~') }}/Library/Keyboard Layouts"
+
+- name: Install Colemak-DH layouts
+  become: "{{ colemak_dh_installation_type == 'system' }}"
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ colemak_dh_dest_dir }}"
+    remote_src: yes
+    owner: "{{ ansible_user_id }}"
+    mode: '0644'
+    directory_mode: '0755'
+  loop: "{{ colemak_dh_bundles.files | map(attribute='path') }}"
+
+- name: Set permissions on keyboard layout bundles
+  become: "{{ colemak_dh_installation_type == 'system' }}"
+  ansible.builtin.file:
+    path: "{{ colemak_dh_dest_dir }}/{{ item }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    mode: "u=rwX,g=rX,o=rX"
+    recurse: yes
+  loop: "{{ colemak_dh_bundles.files | map(attribute='path') | map('basename') }}"
